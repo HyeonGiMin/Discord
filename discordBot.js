@@ -1,9 +1,12 @@
+const fs = require('fs');
+const logger = require('./winston')
 const jsonFile = fs.readFileSync('./config.json', 'utf8');
 const config = JSON.parse(jsonFile);
+const prefix = "!";
 
-const Discord = require("discord.js");
+const { Client, Intents } = require('discord.js');
 
-const client = new Discord.Client();
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 client.on("message", function(message) {
     // message 작성자가 봇이면 그냥 return
