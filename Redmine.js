@@ -18,13 +18,6 @@ exports.main=function(redmineApi,issue){
     setInitialRedmineToDatabaseMap().then(syncDatabaseWithRedmine)
 }
 
-exports.GetSpecific=function(redmineApi,issue){
-    init();
-    REDMINE_API_KEY=redmineApi
-    Issue=issue;
-    _logger.info(`Start Get Specific Redmine Issues at ${moment().format('YYYY-MM-DD HH:mm:ss')}`)
-    // setInitialRedmineToDatabaseMap().then(syncDatabaseWithRedmine)
-}
 function init(){
     notion=null;
     databaseId=null;
@@ -44,7 +37,7 @@ async function setInitialRedmineToDatabaseMap() {
 
 async function syncDatabaseWithRedmine() {
     // Get all issues currently in the provided GitHub repository.
-    _logger.info("\nFetching issues from Notion DB...")
+    _logger.info("\nFetching issues from Mysql DB...")
     const issues = await getRedmineIssuesForRepository()
     _logger.debug(`Fetched ${issues.IHPServerIssues.length} issues from Project:IHP Server.`)
     _logger.debug(`Fetched ${issues.VNAIssues.length} issues from Project:VNA.`)
@@ -57,15 +50,15 @@ async function syncDatabaseWithRedmine() {
 
     // Create pages for new issues.
     _logger.debug(`\n${pagesToCreates.length} new issues to add to Notion.`)
-    // await createPages(pagesToCreates)
+    await createPages(pagesToCreates)
 
     // TODO Update는 차후 개발
     _logger.debug(`\n${pagesToUpdates.length} issues to update in Notion.`)
      await updatePages(pagesToUpdates)
 
     // Success!
-    _logger.debug("\n✅ Notion database is synced with Redmine.")
-    _logger.info(`Finish Fetch Redmine Issueat ${moment().format('YYYY-MM-DD  HH:mm:ss')}`)
+    _logger.debug("\n✅ Mysql database is synced with Redmine.")
+    _logger.info(`Finish Fetch Redmine Issue at ${moment().format('YYYY-MM-DD  HH:mm:ss')}`)
 }
 
 /**
@@ -81,7 +74,7 @@ async function getIssuesFromDatabase() {
     console.log(`${resultRows.length} issues successfully fetched.`)
     return resultRows.map(result => {
         let data=result.dataValues
-        console.log(data)
+        // console.log(data)
         return {
             id: Number(data.id),
             project:data.project,
@@ -279,12 +272,12 @@ async function getRedmineIssuesForRepository() {
             let issueNumber=x.id
             let assigned=x.assigned_to!=undefined?x.assigned_to.name:"";
             let author=x.author.name
-            let created=x.created_on.replace("T"," ").replace("Z","")
+            let created=moment.tz(x.created_on, 'Asia/Seoul').format('YYYY-MM-DD HH:mm:ss')
             let tracker=x.tracker.name
             let priority=x.priority.name
             let project=x.project.name
             let title=x.subject
-            let updated=x.updated_on.replace("T"," ").replace("Z"," ")
+            let updated=moment.tz(x.updated_on, 'Asia/Seoul').format('YYYY-MM-DD HH:mm:ss')
             let status=x.status.name
             let description=x.description
             var object={
@@ -326,12 +319,12 @@ async function getRedmineIssuesForRepository() {
             let issueNumber=x.id
             let assigned=x.assigned_to!=undefined?x.assigned_to.name:"";
             let author=x.author.name
-            let created=x.created_on.replace("T"," ").replace("Z","")
+            let created=moment.tz(x.created_on, 'Asia/Seoul').format('YYYY-MM-DD HH:mm:ss')
             let tracker=x.tracker.name
             let priority=x.priority.name
             let project=x.project.name
             let title=x.subject
-            let updated=x.updated_on.replace("T"," ").replace("Z"," ")
+            let updated=moment.tz(x.updated_on, 'Asia/Seoul').format('YYYY-MM-DD HH:mm:ss')
             let status=x.status.name
             let description=x.description
             var object={
@@ -474,7 +467,7 @@ async function createPages(pagesToCreates) {
     for (const pagesToCreateBatch of pagesToCreateChunks) {
         await Promise.all(
             pagesToCreateBatch.map(issue =>{
-                console.log(issue)
+                // console.log(issue)
                 Issue.create({
                     id: issue.id,
                     project:issue.project,

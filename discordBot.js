@@ -1,5 +1,6 @@
 const fs = require('fs');
 const logger = require('./winston')
+const moment = require('moment');
 const jsonFile = fs.readFileSync('./config/key.json', 'utf8');
 const config = JSON.parse(jsonFile);
 const prefix = "!";
@@ -49,7 +50,7 @@ function trimString(value){
     nextText = nextText.replace(/&nbsp;/ig,"\n");
     nextText = nextText.replace(/&gt;/ig,">");
     nextText = nextText.replace(/\n\s*$/, "");
-    console.log(nextText)
+    // console.log(nextText)
     return nextText;
 }
 
@@ -107,6 +108,30 @@ function GetStatusValue(val){
 
 }
 
+function getJournals(jornals){
+    // console.log(jornals)
+    var msg=""
+    jornals.forEach(x=>{
+        if(x==""){
+            return;
+        }
+        msg=msg+"\n"+trimString(x.notes);
+    })
+
+    return msg;
+}
+
+function chunkSubstr(str, size) {
+    const numChunks = Math.ceil(str.length / size)
+    const chunks = new Array(numChunks)
+
+    for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
+        chunks[i] = str.substr(o, size)
+    }
+
+    return chunks
+}
+
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 client.on("ready", () => {
@@ -120,30 +145,38 @@ client.on("ready", () => {
   //   client.user.setActivity(`Serving
   // ${client.guilds.size} servers`);
   //   process.emit("notify")
+    Redmine.main(config.RedmineAPIKey,Issues);
+    var refreshTime=config.RefreshTime*1000*60
     setInterval(function() {
         Redmine.main(config.RedmineAPIKey,Issues);
-    }, config.RefreshTime*1000);
+    }, refreshTime);
 
+    setInterval(function() {
+        logger.debug("Running Discord Bot "+ moment.tz(updated_on, 'Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'))
+    }, 60000);
 
 });
 
 
 
 process.on("notify",(notificationItems)=>{
+    logger.debug("Notify Event")
     var temp=client.channels.cache.get("940942407258763264")
     temp.send('some message')
 })
 
 process.on("notify-new",(issue)=>{
+    logger.debug("Notify New Issue Event")
     var temp=client.channels.cache.get("940942407258763264")
     var url=`http://src.infinitt.com/issues/${issue.id}`
     var issueNumber=issue.tracker+" #"+issue.id
 
-    temp.send(`[Notify] New Issue Created\n${issueNumber}\n ${issue.title}\n${url}`);
+    temp.send(`[Notify] New Issue Created\n${issueNumber}\n${issue.title}\n\n${url}`);
 });
 
 process.on("notify-update",(issue,previous)=>{
-    var temp=client.channels.cache.get("940942407258763264")
+    logger.debug("Notify Update Issue Event")
+    var replyChanel=client.channels.cache.get("940942407258763264")
     var msg="";
     if(previous.status!=issue.status){
         //상태 변경
@@ -165,15 +198,27 @@ process.on("notify-update",(issue,previous)=>{
     if(previous.project!=issue.project){
         msg=msg+"\n"+Template("project",previous.project,issue.project)
     }
+    if(issue.jornals.length!=0){
+        msg=msg+getJournals(issue.jornals)
+    }
 
 
     var url=`http://src.infinitt.com/issues/${issue.id}`
     var issueNumber=issue.tracker+" #"+issue.id
-    console.log(msg);
-    temp.send(`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${msg}\n\n${url}`);
+    var reply=`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${msg}\n\n${url}`;
+    if(reply.length>1000){
+        var chunk = chunkSubstr(reply,1000);
+        chunk.forEach(x=>{
+            replyChanel.send(x);
+        })
+    }else{
+        replyChanel.send(reply);
+    }
+
 });
 
 client.on("message", function(message) {
+
     // message 작성자가 봇이면 그냥 return
     if (message.author.bot) return;
     // message 시작이 prefix가 아니면 return
@@ -181,13 +226,15 @@ client.on("message", function(message) {
     //
     if(message.channelId!="941279540049752075") return;
 
-    var temp=client.channels.cache.get('CHANNEL ID');
+    logger.debug("message Event")
+
     const commandBody = message.content.slice(prefix.length);
     const args = commandBody.split(' ');
     const command = args.shift().toLowerCase();
 
-    if (command === "ping") {
-        message.reply(`pong!`);
+    if (command === "refresh") {
+        Redmine.main(config.RedmineAPIKey,Issues);
+        message.reply(`refresh Start!`);
     }
 });
 

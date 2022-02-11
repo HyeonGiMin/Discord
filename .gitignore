@@ -1,3 +1,4 @@
 # Project exclude paths
 /node_modules/
 config/key.json
+config/config.json
