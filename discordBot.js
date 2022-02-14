@@ -181,7 +181,15 @@ process.on("notify-update",(issue,previous)=>{
     if(previous.status!=issue.status){
         //상태 변경
         msg=msg+"\n"+Template("status",previous.status,issue.status)
-        msg=msg+"\n"+`진척도을(를) ${GetStatusValue(previous.status)}에서 ${GetStatusValue(issue.status)}(으)로 변경되었습니다.`
+
+        var previousVal,nextVal;
+        previousVal=GetStatusValue(previous.status);
+        nextVal=GetStatusValue(issue.status);
+
+        if(previousVal!=nextVal){
+            msg=msg+"\n"+`진척도을(를) ${previousVal}에서 ${nextVal}(으)로 변경되었습니다.`
+        }
+
     }
     if(previous.assigned_to!=issue.assigned_to){
         //담당자 변경
