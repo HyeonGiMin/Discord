@@ -98,6 +98,8 @@ function GetStatusValue(val){
             return 70;
         case "Ready to Test":
             return 70;
+        case "Test Failed":
+            return 80;
         case "Testing":
             return 90;
         case "Tested":
@@ -177,7 +179,10 @@ process.on("notify-new",(issue)=>{
 process.on("notify-update",(issue,previous)=>{
     logger.debug("Notify Update Issue Event")
     var replyChanel=client.channels.cache.get("940942407258763264")
-    var msg="";
+    var msg;
+
+
+
     if(previous.status!=issue.status){
         //상태 변경
         msg=msg+"\n"+Template("status",previous.status,issue.status)
@@ -211,6 +216,7 @@ process.on("notify-update",(issue,previous)=>{
     }
 
 
+    var who=`${previous.assigned_to}이(가)${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
     var url=`http://src.infinitt.com/issues/${issue.id}`
     var issueNumber=issue.tracker+" #"+issue.id
     var reply=`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${msg}\n\n${url}`;
