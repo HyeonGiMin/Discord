@@ -117,7 +117,8 @@ function getJournals(jornals){
         if(x==""){
             return;
         }
-        msg=msg+"\n"+trimString(x.notes);
+        var who=`${x.user.name}님이 ${moment.tz(x.created_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
+        msg=msg+`\n${who}\n`+trimString(x.notes);
     })
 
     return msg;
@@ -181,7 +182,7 @@ process.on("notify-update",(issue,previous)=>{
     logger.debug("Notify Update Issue Event")
     var replyChanel=client.channels.cache.get("940942407258763264")
     var msg="";
-
+    var who="";
 
 
     if(previous.status!=issue.status){
@@ -214,10 +215,10 @@ process.on("notify-update",(issue,previous)=>{
     }
     if(issue.jornals.length!=0){
         msg=msg+getJournals(issue.jornals)
+    }else{
+        who=`${previous.assigned_to}님이 ${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
     }
 
-
-    var who=`${previous.assigned_to}님이 ${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
     var url=`http://src.infinitt.com/issues/${issue.id}`
     var issueNumber=issue.tracker+" #"+issue.id
     var reply=`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${who}\n${msg}\n\n${url}`;
