@@ -172,7 +172,7 @@ process.on("notify-new",(issue)=>{
     var temp=client.channels.cache.get("940942407258763264")
     var url=`http://src.infinitt.com/issues/${issue.id}`
     var issueNumber=issue.tracker+" #"+issue.id
-    var who=`${author.assigned_to}이(가)${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 생성`
+    var who=`${author.assigned_to}님이 ${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 생성`
 
     temp.send(`[Notify] New Issue Created\n${issueNumber}\n${issue.title}\n${who}\n\n${url}`);
 });
@@ -217,7 +217,7 @@ process.on("notify-update",(issue,previous)=>{
     }
 
 
-    var who=`${previous.assigned_to}이(가)${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
+    var who=`${previous.assigned_to}님이 ${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
     var url=`http://src.infinitt.com/issues/${issue.id}`
     var issueNumber=issue.tracker+" #"+issue.id
     var reply=`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${who}\n${msg}\n\n${url}`;
