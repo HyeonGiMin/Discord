@@ -85,6 +85,7 @@ async function getIssuesFromDatabase() {
             assigned_to:data.assigned_to,
             title:data.title,
             updated_on:data.updated_on,
+            created_on:data.created_on,
             createdAt:data.createdAt,
             updatedAt:data.updatedAt
         }
@@ -137,6 +138,7 @@ async function getRedmineIssuesForRepository() {
                 assigned_to:assigned,
                 title:title,
                 updated_on:updated,
+                created_on:created
             }
             //console.log(object)
             //getPropertiesFromIssue(object)
@@ -173,6 +175,7 @@ async function getRedmineIssuesForRepository() {
                 assigned_to:assigned,
                 title:title,
                 updated_on:updated,
+                created_on:created
             }
 
             //console.log(object)
@@ -209,6 +212,7 @@ async function getRedmineIssuesForRepository() {
                 assigned_to:assigned,
                 title:title,
                 updated_on:updated,
+                created_on:created
             }
             // console.log(object)
             ResearchIssues.push(object);
@@ -244,6 +248,7 @@ async function getRedmineIssuesForRepository() {
                 assigned_to:assigned,
                 title:title,
                 updated_on:updated,
+                created_on:created
             }
 
             // console.log(object)
@@ -290,6 +295,7 @@ async function getRedmineIssuesForRepository() {
                 assigned_to:assigned,
                 title:title,
                 updated_on:updated,
+                created_on:created
             }
 
 
@@ -337,6 +343,7 @@ async function getRedmineIssuesForRepository() {
                 assigned_to:assigned,
                 title:title,
                 updated_on:updated,
+                created_on:created
             }
 
 
@@ -478,6 +485,7 @@ async function createPages(pagesToCreates) {
                     assigned_to:issue.assigned_to,
                     title:issue.title,
                     updated_on:issue.updated_on,
+                    created_on:issue.created_on
                 }).then(()=>{
                     _logger.debug("Insert New Issue")
                     process.emit("notify-new",issue);

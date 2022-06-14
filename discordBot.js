@@ -106,6 +106,8 @@ function GetStatusValue(val){
             return 100;
         case "Closed":
             return 100;
+        case "Rejected":
+            return 100;
     }
 
 }
