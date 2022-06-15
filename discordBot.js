@@ -106,6 +106,8 @@ function GetStatusValue(val){
             return 100;
         case "Closed":
             return 100;
+        case "Rejected":
+            return 100;
     }
 
 }
@@ -117,8 +119,7 @@ function getJournals(jornals){
         if(x==""){
             return;
         }
-        var who=`${x.user.name}님이 ${moment.tz(x.created_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
-        msg=msg+`\n${who}\n`+trimString(x.notes);
+        msg=msg+"\n"+trimString(x.notes);
     })
 
     return msg;
@@ -141,22 +142,22 @@ client.on("ready", () => {
     logger.debug("Start Discord Bot")
     // var temp=client.channels.cache.get("940942407258763264")
     // temp.send('some message')
-  //   console.log(`Bot has started, with
-  // ${client.users.size} users, in
-  // ${client.channels.size} channels of
-  // ${client.guilds.size} guilds.`);
-  //   client.user.setActivity(`Serving
-  // ${client.guilds.size} servers`);
-  //   process.emit("notify")
+    //   console.log(`Bot has started, with
+    // ${client.users.size} users, in
+    // ${client.channels.size} channels of
+    // ${client.guilds.size} guilds.`);
+    //   client.user.setActivity(`Serving
+    // ${client.guilds.size} servers`);
+    //   process.emit("notify")
     Redmine.main(config.RedmineAPIKey,Issues);
     var refreshTime=config.RefreshTime*1000*60
     setInterval(function() {
         Redmine.main(config.RedmineAPIKey,Issues);
     }, refreshTime);
 
-    setInterval(function() {
-        logger.debug("Running Discord Bot "+ moment.tz(updated_on, 'Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'))
-    }, 60000);
+    // setInterval(function() {
+    //     logger.debug("Running Discord Bot "+ moment.tz(updated_on, 'Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'))
+    // }, 60000);
 
 });
 
@@ -173,16 +174,15 @@ process.on("notify-new",(issue)=>{
     var temp=client.channels.cache.get("940942407258763264")
     var url=`http://src.infinitt.com/issues/${issue.id}`
     var issueNumber=issue.tracker+" #"+issue.id
-    var who=`${author.assigned_to}님이 ${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 생성`
 
-    temp.send(`[Notify] New Issue Created\n${issueNumber}\n${issue.title}\n${who}\n\n${url}`);
+    temp.send(`[Notify] New Issue Created\n${issueNumber}\n${issue.title}\n\n${url}`);
 });
 
 process.on("notify-update",(issue,previous)=>{
     logger.debug("Notify Update Issue Event")
     var replyChanel=client.channels.cache.get("940942407258763264")
-    var msg="";
-    var who="";
+    var msg=""
+
 
 
     if(previous.status!=issue.status){
@@ -215,10 +215,10 @@ process.on("notify-update",(issue,previous)=>{
     }
     if(issue.jornals.length!=0){
         msg=msg+getJournals(issue.jornals)
-    }else{
-        who=`${previous.assigned_to}님이 ${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
     }
 
+
+    var who=`${previous.assigned_to}이(가)${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
     var url=`http://src.infinitt.com/issues/${issue.id}`
     var issueNumber=issue.tracker+" #"+issue.id
     var reply=`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${who}\n${msg}\n\n${url}`;
