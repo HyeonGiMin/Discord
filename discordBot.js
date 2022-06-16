@@ -142,22 +142,22 @@ client.on("ready", () => {
     logger.debug("Start Discord Bot")
     // var temp=client.channels.cache.get("940942407258763264")
     // temp.send('some message')
-  //   console.log(`Bot has started, with
-  // ${client.users.size} users, in
-  // ${client.channels.size} channels of
-  // ${client.guilds.size} guilds.`);
-  //   client.user.setActivity(`Serving
-  // ${client.guilds.size} servers`);
-  //   process.emit("notify")
+    //   console.log(`Bot has started, with
+    // ${client.users.size} users, in
+    // ${client.channels.size} channels of
+    // ${client.guilds.size} guilds.`);
+    //   client.user.setActivity(`Serving
+    // ${client.guilds.size} servers`);
+    //   process.emit("notify")
     Redmine.main(config.RedmineAPIKey,Issues);
     var refreshTime=config.RefreshTime*1000*60
     setInterval(function() {
         Redmine.main(config.RedmineAPIKey,Issues);
     }, refreshTime);
 
-    setInterval(function() {
-        logger.debug("Running Discord Bot "+ moment.tz(updated_on, 'Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'))
-    }, 60000);
+    // setInterval(function() {
+    //     logger.debug("Running Discord Bot "+ moment.tz(updated_on, 'Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'))
+    // }, 60000);
 
 });
 
@@ -181,7 +181,7 @@ process.on("notify-new",(issue)=>{
 process.on("notify-update",(issue,previous)=>{
     logger.debug("Notify Update Issue Event")
     var replyChanel=client.channels.cache.get("940942407258763264")
-    var msg;
+    var msg=""
 
 
 
@@ -221,7 +221,7 @@ process.on("notify-update",(issue,previous)=>{
     var who=`${previous.assigned_to}이(가)${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
     var url=`http://src.infinitt.com/issues/${issue.id}`
     var issueNumber=issue.tracker+" #"+issue.id
-    var reply=`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${msg}\n\n${url}`;
+    var reply=`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${who}\n${msg}\n\n${url}`;
     if(reply.length>1000){
         var chunk = chunkSubstr(reply,1000);
         chunk.forEach(x=>{
