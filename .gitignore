@@ -2,3 +2,5 @@
 /node_modules/
 config/key.json
 config/config.json
+*.log
+logs/.aca65426d3885df8c5a1b01be179871fcb4bc88c-audit.json
