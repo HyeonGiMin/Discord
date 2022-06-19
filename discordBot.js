@@ -8,6 +8,33 @@ const { Client, Intents } = require('discord.js');
 const sequelize = require('./models/index').sequelize;
 const Redmine=require("./Redmine")
 const { Issues } = require('./models');
+const Koa = require('koa');
+const Router = require('koa-router');
+
+const app = new Koa();
+const router = new Router();
+const port = 4000;
+
+const { Prometheus } = require('./metrics');
+
+router.get('/metrics', async (ctx) => {
+    const { metrics, contentType } = await Prometheus.get();
+
+    ctx.set('Content-Type', contentType);
+    ctx.body = metrics;
+});
+
+router.get('/metrics/:name', (ctx) => {
+    const { name } = ctx.params;
+    const randomNumber = Math.round(Math.random() * 10);
+    console.info(name, randomNumber);
+    // Prometheus.add({ name:'histogram', data:'start Redmine'});
+    Prometheus.add({ name:'histogram', data: randomNumber });
+    Prometheus.add({ name:'counter', data: randomNumber });
+    Prometheus.add({ name:'gauge', data: randomNumber });
+    Prometheus.add({ name:'summary', data: randomNumber });
+    ctx.body = 'done';
+});
 
 const main=async ()=>{
     let result= await driver();
@@ -258,5 +285,11 @@ client.on("message", function(message) {
     }
 });
 
-main();
+// main();
 
+app.use(router.routes());
+app.use(router.allowedMethods());
+
+app.listen(port, () => {
+    console.info(`Test server is listening on port #${port}`);
+});

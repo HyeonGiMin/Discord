@@ -9,6 +9,7 @@ const OPERATION_BATCH_SIZE = 10
 var REDMINE_API_KEY
 const REDMINE_API_LIMIT=100
 var Issue
+const { Prometheus } = require('./metrics');
 
 exports.main=function(redmineApi,issue){
     init();
@@ -28,6 +29,7 @@ function init(){
  * Get and set the initial data store with issues currently in the database.
  */
 async function setInitialRedmineToDatabaseMap() {
+    Prometheus.add({ name:'histogram', data:'start Redmine'});
     const currentIssues = await getIssuesFromDatabase()
     for (const { id, updated_on,status,assigned_to,tracker,priority,project} of currentIssues) {
         var updated_on_string=moment.tz(updated_on, 'Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
