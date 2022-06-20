@@ -29,7 +29,7 @@ const options = {
     },
     rolling:{
         level: 'debug',
-        filename: `${appRoot}/logs/DiscordBot-\%DATE\%.log`, // 로그파일을 남길 경로
+        filename: `${appRoot}/logs/Msg/DiscordBotMsg.log`, // 로그파일을 남길 경로
         datePattern: 'YYYY-MM-DD',
         showlevel: true,
         json: false,
@@ -64,8 +64,17 @@ let logger = new winston.createLogger({
     exitOnError: false,
 });
 
+let msgLogger =new winston.createLogger(({
+    transports: [
+        new winston.transports.File(options.rolling) ,
+        new(winstonDaily)(options.rolling)
+    ],
+    exitOnError: false,
+}))
+
 if(process.env.NODE_ENV !== 'production'){
     logger.add(new winston.transports.Console(options.console)) // 개발 시 console로도 출력
 }
 
 module.exports = logger;
+module.exports = msgLogger;

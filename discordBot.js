@@ -1,5 +1,6 @@
 const fs = require('fs');
 const logger = require('./winston')
+const msgLogger = require('./winston')
 const moment = require('moment');
 const jsonFile = fs.readFileSync('./config/key.json', 'utf8');
 const config = JSON.parse(jsonFile);
@@ -206,6 +207,7 @@ process.on("notify-new",(issue)=>{
     var url=`http://src.infinitt.com/issues/${issue.id}`
     var issueNumber=issue.tracker+" #"+issue.id
     var who=`${previous.assigned_to}이(가)${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 생성`
+    msgLogger.debug(`[Notify] New Issue Created\n${issueNumber}\n${issue.title}\n${who}\n\n${url}`);
     temp.send(`[Notify] New Issue Created\n${issueNumber}\n${issue.title}\n${who}\n\n${url}`);
 });
 
@@ -261,7 +263,7 @@ process.on("notify-update",(issue,previous)=>{
     }else{
         replyChanel.send(reply);
     }
-
+    msgLogger.debug(`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${who}\n${msg}\n\n${url}`);
 });
 
 client.on("message", function(message) {
