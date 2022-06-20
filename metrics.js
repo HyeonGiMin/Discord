@@ -1,4 +1,6 @@
-const { Registry, Counter, Gauge, Histogram, Summary, register } = require('prom-client');
+const { Registry, Counter, Gauge, Histogram, Summary,register,collectDefaultMetrics } = require('prom-client');
+const prefix = 'discordBot_';
+collectDefaultMetrics({ prefix });
 
 const prometheus = () => {
     const registry = new Registry();
@@ -23,18 +25,18 @@ const prometheus = () => {
         }
     };
 
-    const add = ({ name, data }) => {
+    const add = ({ name, data,labels }) => {
         if (instances[name]) {
             const { type, instance } = instances[name];
 
             if (type === 'counter') {
-                instance.labels({ method: 'GET', statusCode: '200' }).inc(data);
+                instance.labels(labels).inc(data);
             } else if (type === 'gauge') {
-                instance.labels({ method: 'GET', statusCode: '200' }).set(data);
+                instance.labels(labels).set(data);
             } else if (type === 'histogram') {
-                instance.labels({ method: 'IssueCount', statusCode: '200' }).observe(data);
+                instance.labels(labels).observe(data);
             } else if (type === 'summary') {
-                instance.labels({ method: 'GET', statusCode: '200' }).observe(data);
+                instance.labels(labels).observe(data);
             }
         }
     };
@@ -54,25 +56,25 @@ Prometheus.create({
     type: 'counter',
     name: 'counter',
     help: 'random counter for test',
-    labelNames: ['method', 'statusCode'],
+    labelNames: ['Project', 'Type'],
 });
 Prometheus.create({
     type: 'gauge',
     name: 'gauge',
     help: 'random gauge for test',
-    labelNames: ['method', 'statusCode'],
+    labelNames: ['Project', 'Type'],
 });
 Prometheus.create({
     type: 'histogram',
     name: 'histogram',
     help: 'random histogram for test',
-    labelNames: ['method', 'statusCode'],
+    labelNames: ['Project', 'Type'],
 });
 Prometheus.create({
     type: 'summary',
     name: 'summary',
     help: 'random summary for test',
-    labelNames: ['method', 'statusCode'],
+    labelNames: ['Project', 'Type'],
 });
 
 module.exports = {

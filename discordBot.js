@@ -30,10 +30,10 @@ router.get('/metrics/:name', (ctx) => {
     const randomNumber = Math.round(Math.random() * 10);
     console.info(name, randomNumber);
     // Prometheus.add({ name:'histogram', data:'start Redmine'});
-    Prometheus.add({ name:'histogram', data: randomNumber });
-    Prometheus.add({ name:'counter', data: randomNumber });
-    Prometheus.add({ name:'gauge', data: randomNumber });
-    Prometheus.add({ name:'summary', data: randomNumber });
+    Prometheus.add({ name:'histogram', data: randomNumber,labels:{Project:'VNA(IHP)',Type:'New'} });
+    // Prometheus.add({ name:'counter', data: randomNumber });
+    // Prometheus.add({ name:'gauge', data: randomNumber });
+    // Prometheus.add({ name:'summary', data: randomNumber });
     ctx.body = 'done';
 });
 
@@ -209,6 +209,7 @@ process.on("notify-new",(issue)=>{
     var who=`${previous.assigned_to}이(가)${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 생성`
     msgLogger.debug(`[Notify] New Issue Created\n${issueNumber}\n${issue.title}\n${who}\n\n${url}`);
     temp.send(`[Notify] New Issue Created\n${issueNumber}\n${issue.title}\n${who}\n\n${url}`);
+    Prometheus.add({ name:'counter', data: 1,labels:{Project:issue.project,Type:'New'} });
 });
 
 process.on("notify-update",(issue,previous)=>{
@@ -264,6 +265,7 @@ process.on("notify-update",(issue,previous)=>{
         replyChanel.send(reply);
     }
     msgLogger.debug(`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${who}\n${msg}\n\n${url}`);
+    Prometheus.add({ name:'counter', data: 1,labels:{Project:issue.project,Type:'Update'} });
 });
 
 client.on("message", function(message) {

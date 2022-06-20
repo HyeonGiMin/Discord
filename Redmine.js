@@ -29,7 +29,6 @@ function init(){
  * Get and set the initial data store with issues currently in the database.
  */
 async function setInitialRedmineToDatabaseMap() {
-    Prometheus.add({ name:'histogram', data:'start Redmine'});
     const currentIssues = await getIssuesFromDatabase()
     for (const { id, updated_on,status,assigned_to,tracker,priority,project} of currentIssues) {
         var updated_on_string=moment.tz(updated_on, 'Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
@@ -117,7 +116,7 @@ async function getRedmineIssuesForRepository() {
         // var xmlToJson=convert.xml2json(res.data);
         // let temp=JSON.parse(xmlToJson)
         //console.log(jsonData)
-
+        Prometheus.add({ name:'summary', data:  jsonData.issues.length,labels:{Project:'IHPServer',Type:'Fetch'} });
         jsonData.issues.map(x=>{
             let issueNumber=x.id
             let assigned=x.assigned_to!=undefined?x.assigned_to.name:"";
@@ -154,7 +153,7 @@ async function getRedmineIssuesForRepository() {
         // var xmlToJson=convert.xml2json(res.data);
         // let temp=JSON.parse(xmlToJson)
         //console.log(jsonData)
-
+        Prometheus.add({ name:'summary', data:  jsonData.issues.length,labels:{Project:'VNA(IHP)',Type:'Fetch'} });
         jsonData.issues.map(x=>{
             let issueNumber=x.id
             let assigned=x.assigned_to!=undefined?x.assigned_to.name:"";
@@ -191,7 +190,7 @@ async function getRedmineIssuesForRepository() {
         // var xmlToJson=convert.xml2json(res.data);
         // let temp=JSON.parse(xmlToJson)
         //console.log(jsonData)
-
+        Prometheus.add({ name:'summary', data:  jsonData.issues.length,labels:{Project:'Research IHP',Type:'Fetch'} });
         jsonData.issues.map(x=>{
             let issueNumber=x.id
             let assigned=x.assigned_to!=undefined?x.assigned_to.name:"";
@@ -227,7 +226,7 @@ async function getRedmineIssuesForRepository() {
         // var xmlToJson=convert.xml2json(res.data);
         // let temp=JSON.parse(xmlToJson)
         //console.log(jsonData)
-
+        Prometheus.add({ name:'summary', data:  jsonData.issues.length,labels:{Project:'CU Mobile',Type:'Fetch'} });
         jsonData.issues.map(x=>{
             let issueNumber=x.id
             let assigned=x.assigned_to!=undefined?x.assigned_to.name:"";
@@ -264,7 +263,7 @@ async function getRedmineIssuesForRepository() {
         // var xmlToJson=convert.xml2json(res.data);
         // let temp=JSON.parse(xmlToJson)
         //console.log(jsonData)
-
+        Prometheus.add({ name:'summary', data:  jsonData.issues.length,labels:{Project:'GxDatabase',Type:'Fetch'} });
         jsonData.issues.map(x=>{
 
             var filter =x.custom_fields.find((x)=>{
@@ -312,7 +311,7 @@ async function getRedmineIssuesForRepository() {
         // var xmlToJson=convert.xml2json(res.data);
         // let temp=JSON.parse(xmlToJson)
         //console.log(jsonData)
-
+        Prometheus.add({ name:'summary', data:  jsonData.issues.length,labels:{Project:'RTM',Type:'Fetch'} });
         jsonData.issues.map(x=>{
 
             var filter =x.custom_fields.find((x)=>{
@@ -477,6 +476,7 @@ async function createPages(pagesToCreates) {
         await Promise.all(
             pagesToCreateBatch.map(issue =>{
                 // console.log(issue)
+
                 Issue.create({
                     id: issue.id,
                     project:issue.project,
@@ -489,6 +489,7 @@ async function createPages(pagesToCreates) {
                     updated_on:issue.updated_on,
                     created_on:issue.created_on
                 }).then(()=>{
+                    Prometheus.add({ name:'histogram', data: 1,length,labels:{Project:issue.project,Type:'New'} });
                     _logger.debug("Insert New Issue")
                     process.emit("notify-new",issue);
                 }).catch((e)=>{
@@ -569,6 +570,7 @@ async function GetDetailIssue(id,updated_dttm){
 
         Issue.update({project:obj.project, status:obj.status,tracker:obj.tracker,priority:obj.priority,assigned_to:obj.assigned_to,updated_on:obj.updated_on}, {where: {id: id}})
             .then(()=>{
+                Prometheus.add({ name:'histogram', data: 1,length,labels:{Project:obj.project,Type:'Update'} });
                 process.emit("notify-update",obj,redmineIssuesIdToDB[id]);
             })
             .catch((e)=>{
