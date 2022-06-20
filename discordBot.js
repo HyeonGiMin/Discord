@@ -296,4 +296,5 @@ app.use(router.allowedMethods());
 
 app.listen(port, () => {
     console.info(`Test server is listening on port #${port}`);
+    main();
 });
