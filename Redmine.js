@@ -1,4 +1,4 @@
-var _logger= require("./winston");
+var _logger= require("./winston").logger;
 const moment = require('moment');
 const axios = require('axios')
 const _ = require("lodash")
@@ -489,7 +489,7 @@ async function createPages(pagesToCreates) {
                     updated_on:issue.updated_on,
                     created_on:issue.created_on
                 }).then(()=>{
-                    Prometheus.add({ name:'histogram', data: 1,length,labels:{Project:issue.project,Type:'New'} });
+                    Prometheus.add({ name:'histogram', data: 1,labels:{Project:issue.project,Type:'New'} });
                     _logger.debug("Insert New Issue")
                     process.emit("notify-new",issue);
                 }).catch((e)=>{
@@ -570,7 +570,7 @@ async function GetDetailIssue(id,updated_dttm){
 
         Issue.update({project:obj.project, status:obj.status,tracker:obj.tracker,priority:obj.priority,assigned_to:obj.assigned_to,updated_on:obj.updated_on}, {where: {id: id}})
             .then(()=>{
-                Prometheus.add({ name:'histogram', data: 1,length,labels:{Project:obj.project,Type:'Update'} });
+                Prometheus.add({ name:'histogram', data: 1,labels:{Project:obj.project,Type:'Update'} });
                 process.emit("notify-update",obj,redmineIssuesIdToDB[id]);
             })
             .catch((e)=>{
