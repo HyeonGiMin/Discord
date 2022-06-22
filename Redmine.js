@@ -1,4 +1,4 @@
-var _logger= require("./winston");
+var _logger= require("./winston").logger;
 const moment = require('moment');
 const axios = require('axios')
 const _ = require("lodash")

@@ -1,6 +1,6 @@
 const fs = require('fs');
-const logger = require('./winston')
-const msgLogger = require('./winston')
+const logger = require('./winston').logger
+const msgLogger = require('./winston').msgLogger
 const moment = require('moment');
 const jsonFile = fs.readFileSync('./config/key.json', 'utf8');
 const config = JSON.parse(jsonFile);
