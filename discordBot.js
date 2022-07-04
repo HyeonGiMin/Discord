@@ -151,7 +151,8 @@ function getJournals(jornals){
         if(x==""){
             return;
         }
-        msg=msg+"\n"+trimString(x.notes);
+        var who=`${x.user.name}이(가)${moment.tz(x.created_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
+        msg=msg+`\n\n${who}\n`+trimString(x.notes);
     })
 
     return msg;
@@ -257,10 +258,9 @@ process.on("notify-update",(issue,previous)=>{
     }
 
 
-    var who=`${previous.assigned_to}이(가)${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
     var url=`http://src.infinitt.com/issues/${issue.id}`
     var issueNumber=issue.tracker+" #"+issue.id
-    var reply=`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${who}\n${msg}\n\n${url}`;
+    var reply=`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${msg}\n\n${url}`;
     if(reply.length>1000){
         var chunk = chunkSubstr(reply,1000);
         chunk.forEach(x=>{
@@ -269,7 +269,7 @@ process.on("notify-update",(issue,previous)=>{
     }else{
         replyChanel.send(reply);
     }
-    msgLogger.debug(`[Notify] Issue Updated\n${issueNumber}\n${issue.title}\n${who}\n${msg}\n\n${url}`);
+    msgLogger.debug(`[Notify] Issue Updated\n${issueNumber}\n${issue.title}}\n${msg}\n\n${url}`);
     Prometheus.add({ name:'counter', data: 1,labels:{Project:issue.project,Type:'Update'} });
 });
 
