@@ -152,7 +152,11 @@ function getJournals(jornals){
             return;
         }
         var who=`${x.user.name}이(가)${moment.tz(x.created_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 변경`
-        msg=msg+`\n\n${who}\n`+trimString(x.notes);
+        if(x.notes==""&&details.property=="dmsf_file"){
+            msg=msg+`\n\n${who}\n`+`문서에 ${x.details.new_value}이(가) 추가되었습니다.\n`;
+        }else{
+            msg=msg+`\n\n${who}\n`+trimString(x.notes);
+        }
     })
 
     return msg;
