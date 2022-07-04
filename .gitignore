@@ -4,3 +4,5 @@ config/key.json
 config/config.json
 *.log
 logs/.aca65426d3885df8c5a1b01be179871fcb4bc88c-audit.json
+logs/Msg/.16636aa24361c9034bb9a5c2d3d2a89ddd353f53-audit.json
+logs/Msg/DiscordBotMsg.log.2022-06-21
