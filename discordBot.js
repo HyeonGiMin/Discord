@@ -213,7 +213,9 @@ process.on("notify-new",(issue)=>{
     var issueNumber=issue.tracker+" #"+issue.id
     var who=`${issue.author}이(가)${moment.tz(issue.updated_on, 'Asia/Seoul').format('YYYY/MM/DD')}에 생성`
     if(issue.author!=issue.assigned_to){
-        who+=`\n${issue.assigned_to}에 할당`
+        if(issue.assigned_to!=""){
+            who+=`\n${issue.assigned_to}에 할당`
+        }
     }
 
 
